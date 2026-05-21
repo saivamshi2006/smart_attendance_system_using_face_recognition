@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Edit attendance — {{ college_name }}{% endblock %}
+{% block heading %}Edit attendance records{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <p class="muted">Latest 200 rows. Changes are marked as manual.</p>
+    {% if records %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student</th>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>P</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Type</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td>{{ r['id'] }}</td>
+                    <td>{{ r['student_id'] }}</td>
+                    <td>{{ r['name'] }}</td>
+                    <td>{{ r['date'] }}</td>
+                    <td>{{ r['period'] }}</td>
+                    <td>{{ r['subject'] }}</td>
+                    <td>{{ r['status'] }}</td>
+                    <td>{{ r['attendance_type'] }}</td>
+                    <td>
+                        <form method="post" class="inline-form">
+                            <input type="hidden" name="record_id" value="{{ r['id'] }}" />
+                            <select name="status" style="width:auto;display:inline-block;">
+                                <option value="Present" {% if r['status']=='Present' %}selected{% endif %}>Present</option>
+                                <option value="Absent" {% if r['status']=='Absent' %}selected{% endif %}>Absent</option>
+                            </select>
+                            <button type="submit" style="width:auto;">Save</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No records.</p>
+    {% endif %}
+</section>
+{% endblock %}

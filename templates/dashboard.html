@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="page-section">
+        <h2>Attendance Dashboard</h2>
+        {% if records %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                            <tr>
+                                <td>{{ record.user_id }}</td>
+                                <td>{{ record.name }}</td>
+                                <td>{{ record.date }}</td>
+                                <td>{{ record.time }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No attendance records available yet.</p>
+        {% endif %}
+    </section>
+{% endblock %}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{{ college_name }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="{% if session.get('login_id') %}app-shell{% endif %}">
+{% if session.get('login_id') %}
+<div class="layout-portal">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            {% if college_logo_url %}
+            <img src="{{ college_logo_url }}" alt="" class="sidebar-logo" />
+            {% endif %}
+            <span class="sidebar-title">{{ college_name }}</span>
+        </div>
+        <nav class="sidebar-nav">
+            {% if session.get('role') == 'admin' %}
+                <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('add_department') }}">Departments</a>
+                <a href="{{ url_for('add_branch') }}">Programs</a>
+                <a href="{{ url_for('add_section') }}">Sections</a>
+                <a href="{{ url_for('add_student') }}">Add student</a>
+                <a href="{{ url_for('view_students') }}">Students</a>
+                <a href="{{ url_for('admin_lecturers') }}">Lecturers</a>
+                <a href="{{ url_for('admin_schedule') }}">Schedules</a>
+                <a href="{{ url_for('admin_holidays') }}">Holidays</a>
+                <a href="{{ url_for('admin_settings') }}">College settings</a>
+                <a href="{{ url_for('admin_view_attendance') }}">Attendance</a>
+                <a href="{{ url_for('admin_download') }}">Export CSV</a>
+            {% elif session.get('role') in ('lecturer', 'teacher') %}
+                <a href="{{ url_for('lecturer_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('lecturer_edit_attendance') }}">Edit attendance</a>
+            {% elif session.get('role') == 'student' %}
+                <a href="{{ url_for('student_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('student_attendance_page') }}">Mark attendance</a>
+                <a href="{{ url_for('student_calendar') }}">Calendar</a>
+            {% endif %}
+        </nav>
+        <div class="sidebar-footer">
+            <span class="sidebar-user">{{ session.get('username') }}</span>
+            <a href="{{ url_for('logout') }}" class="sidebar-logout">Logout</a>
+        </div>
+    </aside>
+    <div class="layout-main">
+        <header class="topbar">
+            <h1 class="topbar-heading">{% block heading %}{% endblock %}</h1>
+        </header>
+        <div class="main-content">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <div class="flash-item">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+{% else %}
+<header class="site-header">
+    <div class="container header-inner">
+        <h1>{{ college_name }}</h1>
+        <nav class="main-nav">
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        </nav>
+    </div>
+</header>
+<main class="container">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %}
+                    <div class="flash-item">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endif %}
+{% block content %}{% endblock %}
+{% if session.get('login_id') %}
+        </div>
+        <footer class="site-footer-inner">Flask · SQLite · OpenCV · Iris recognition</footer>
+    </div>
+</div>
+{% else %}
+</main>
+<footer class="site-footer">
+    <div class="container">Flask · SQLite · OpenCV iris/eye recognition</div>
+</footer>
+{% endif %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

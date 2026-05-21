@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Schedules — {{ college_name }}{% endblock %}
+{% block heading %}Class & lab schedules{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <h2>Add schedule row</h2>
+    <p class="muted">Use the same <strong>Department</strong> label as the student program (branch name), e.g. CSE-AIML. Match standard slot times for class rows (e.g. 09:20–10:10).</p>
+    <form method="post" class="form-grid narrow-form">
+        <label>Department (program name)
+            <input type="text" name="department" required placeholder="CSE-AIML" />
+        </label>
+        <label>Year
+            <select name="year" required>
+                <option>1st</option>
+                <option>2nd</option>
+                <option>3rd</option>
+                <option>4th</option>
+            </select>
+        </label>
+        <label>Section
+            <input type="text" name="section" required placeholder="A" maxlength="4" />
+        </label>
+        <label>Subject
+            <input type="text" name="subject" required />
+        </label>
+        <label>Faculty
+            <input type="text" name="faculty" required />
+        </label>
+        <label>Start time (HH:MM)
+            <input type="text" name="start_time" required placeholder="09:20" />
+        </label>
+        <label>End time (HH:MM)
+            <input type="text" name="end_time" required placeholder="10:10" />
+        </label>
+        <label>Type
+            <select name="type" required>
+                <option value="class">class</option>
+                <option value="lab">lab</option>
+            </select>
+        </label>
+        <label>Date (YYYY-MM-DD)
+            <input type="date" name="date" required />
+        </label>
+        <div class="submit-row">
+            <button type="submit">Save schedule</button>
+        </div>
+    </form>
+</section>
+
+<section class="page-section" style="margin-top:24px;">
+    <h2>Recent entries</h2>
+    {% if schedules %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Dept</th>
+                    <th>Year</th>
+                    <th>Sec</th>
+                    <th>Subject</th>
+                    <th>Faculty</th>
+                    <th>Time</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in schedules %}
+                <tr>
+                    <td>{{ r['date'] }}</td>
+                    <td>{{ r['department'] }}</td>
+                    <td>{{ r['year'] }}</td>
+                    <td>{{ r['section'] }}</td>
+                    <td>{{ r['subject'] }}</td>
+                    <td>{{ r['faculty'] }}</td>
+                    <td>{{ r['start_time'] }}–{{ r['end_time'] }}</td>
+                    <td>{{ r['type'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="muted">No schedules yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

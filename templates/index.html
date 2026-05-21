@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="hero">
+        <h2>Iris Recognition Attendance System</h2>
+        <p>Register users with iris images, then mark attendance through webcam capture or image upload.</p>
+        <div class="cards">
+            <a class="card" href="{{ url_for('register') }}">Register New User</a>
+            <a class="card" href="{{ url_for('attendance') }}">Mark Attendance</a>
+            <a class="card" href="{{ url_for('dashboard') }}">View Dashboard</a>
+        </div>
+    </section>
+{% endblock %}

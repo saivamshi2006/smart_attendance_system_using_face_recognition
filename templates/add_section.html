@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Add Section{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <h2>Add section</h2>
+    <form method="post" class="form-grid narrow-form" id="sectionForm">
+        <label>
+            Department
+            <select id="departmentSelect" required>
+                <option value="">— Select —</option>
+                {% for d in departments %}
+                <option value="{{ d['id'] }}">{{ d['name'] }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            Branch
+            <select name="branch_id" id="branchSelect" required disabled>
+                <option value="">— Select department first —</option>
+            </select>
+        </label>
+        <label>
+            Section name
+            <input type="text" name="name" placeholder="e.g. A" required />
+        </label>
+        <div class="submit-row">
+            <button type="submit">Save</button>
+            <a class="link-button" href="{{ url_for('admin_dashboard') }}">Back to admin</a>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const dept = document.getElementById('departmentSelect');
+  const branch = document.getElementById('branchSelect');
+
+  async function loadBranches() {
+    branch.innerHTML = '<option value="">Loading…</option>';
+    branch.disabled = true;
+    const id = dept.value;
+    if (!id) {
+      branch.innerHTML = '<option value="">— Select department first —</option>';
+      return;
+    }
+    const res = await fetch('{{ url_for("api_branches") }}?department_id=' + encodeURIComponent(id));
+    const data = await res.json();
+    branch.innerHTML = '<option value="">— Select —</option>';
+    data.forEach(function (b) {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.name;
+      branch.appendChild(opt);
+    });
+    branch.disabled = false;
+  }
+  dept.addEventListener('change', loadBranches);
+})();
+</script>
+{% endblock %}

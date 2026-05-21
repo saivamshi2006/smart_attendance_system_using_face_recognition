@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Mark attendance — {{ college_name }}{% endblock %}
+{% block heading %}Mark attendance{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <p class="muted">Webcam starts automatically. Align your eyes with the guides, then press <strong>Mark Attendance</strong> once.</p>
+    <div id="cameraError" class="camera-error" hidden></div>
+    <div class="camera-stage">
+        <video id="video" autoplay muted playsinline></video>
+        <div class="face-overlay">
+            <div class="align-frame"></div>
+            <div class="face-oval"></div>
+            <div class="eye-guides"></div>
+        </div>
+    </div>
+    <p class="camera-hint">Center your face in the dotted oval. Look directly at the camera.</p>
+    <canvas id="canvas" hidden></canvas>
+    <button type="button" class="btn-mark-attendance" id="btnMarkAttendance">Mark Attendance</button>
+    <p id="markResult" class="hint" style="text-align:center;"></p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const btn = document.getElementById('btnMarkAttendance');
+  const err = document.getElementById('cameraError');
+  const result = document.getElementById('markResult');
+  let stream = null;
+
+  function showErr(msg) {
+    err.textContent = msg;
+    err.hidden = false;
+  }
+
+  async function startCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showErr('Camera not supported in this browser.');
+      return;
+    }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user' },
+        audio: false,
+      });
+      video.srcObject = stream;
+    } catch (e) {
+      showErr('Unable to access camera. Check permissions.');
+    }
+  }
+
+  function capture() {
+    if (!stream || !video.videoWidth) return null;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    return canvas.toDataURL('image/jpeg', 0.92);
+  }
+
+  btn.addEventListener('click', async function () {
+    const dataUrl = capture();
+    if (!dataUrl) {
+      showErr('Wait for the camera preview, then try again.');
+      return;
+    }
+    result.textContent = 'Verifying…';
+    btn.disabled = true;
+    try {
+      const res = await fetch('{{ url_for("student_mark_attendance") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ captured_image: dataUrl }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        result.textContent = data.message + ' (period ' + data.period + ')';
+        result.style.color = '#166534';
+      } else {
+        result.textContent = data.error || 'Failed';
+        result.style.color = '#991b1b';
+      }
+    } catch (e) {
+      result.textContent = 'Network error';
+      result.style.color = '#991b1b';
+    }
+    btn.disabled = false;
+  });
+
+  window.addEventListener('beforeunload', function () {
+    if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+  });
+  startCamera();
+})();
+</script>
+{% endblock %}

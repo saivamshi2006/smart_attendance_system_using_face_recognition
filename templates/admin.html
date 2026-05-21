@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Admin — College Attendance{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <h2>Administration</h2>
+    <p class="muted">Manage departments, branches, sections, students, and review attendance.</p>
+
+    <div class="stats-row">
+        <div class="stat-card"><span class="stat-value">{{ dept_count }}</span><span class="stat-label">Departments</span></div>
+        <div class="stat-card"><span class="stat-value">{{ student_count }}</span><span class="stat-label">Students</span></div>
+        <div class="stat-card"><span class="stat-value">{{ att_count }}</span><span class="stat-label">Attendance rows</span></div>
+    </div>
+
+    <div class="cards admin-cards">
+        <a class="card card-neutral" href="{{ url_for('add_department') }}">Add Department</a>
+        <a class="card card-neutral" href="{{ url_for('add_branch') }}">Add Branch</a>
+        <a class="card card-neutral" href="{{ url_for('add_section') }}">Add Section</a>
+        <a class="card" href="{{ url_for('add_student') }}">Add Student</a>
+        <a class="card" href="{{ url_for('view_students') }}">View / Delete Students</a>
+        <a class="card" href="{{ url_for('admin_view_attendance') }}">View Attendance</a>
+        <a class="card card-outline" href="{{ url_for('admin_download') }}">Download CSV</a>
+    </div>
+</section>
+{% endblock %}

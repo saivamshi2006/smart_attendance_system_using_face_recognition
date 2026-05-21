@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block title %}Register — {{ college_name }}{% endblock %}
+{% block heading %}Create account{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <p class="muted">After you register, ask the admin to open <strong>Students → Iris</strong> on your roll number to capture iris samples (or enroll entirely from the admin panel).</p>
+
+    <h2>Student registration</h2>
+    <form method="post" class="form-grid narrow-form">
+        <input type="hidden" name="role" value="student" />
+        <label>Roll number / Student ID
+            <input type="text" name="student_id" required />
+        </label>
+        <label>Full name
+            <input type="text" name="name" required />
+        </label>
+        <label>Username (login)
+            <input type="text" name="username" autocomplete="username" required />
+        </label>
+        <label>Password
+            <input type="password" name="password" autocomplete="new-password" required />
+        </label>
+        <label>Year
+            <select name="year" required>
+                <option>1st</option>
+                <option>2nd</option>
+                <option>3rd</option>
+                <option>4th</option>
+            </select>
+        </label>
+        <label>Department
+            <select name="department_id" id="regDepartmentSelect" required>
+                <option value="">— Select —</option>
+                {% for d in departments %}
+                <option value="{{ d['id'] }}">{{ d['name'] }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Program (branch)
+            <select name="branch_id" id="regBranchSelect" disabled required>
+                <option value="">— Select department first —</option>
+            </select>
+        </label>
+        <label>Section
+            <select name="section_id" id="regSectionSelect" disabled required>
+                <option value="">— Select program first —</option>
+            </select>
+        </label>
+        <div class="submit-row">
+            <button type="submit">Register as student</button>
+        </div>
+    </form>
+</section>
+
+<section class="page-section" style="margin-top:28px;">
+    <h2>Lecturer registration</h2>
+    <form method="post" class="form-grid narrow-form">
+        <input type="hidden" name="role" value="lecturer" />
+        <label>Lecturer ID
+            <input type="text" name="lecturer_id" required />
+        </label>
+        <label>Full name
+            <input type="text" name="name" required />
+        </label>
+        <label>Department
+            <select name="department" required>
+                <option value="">— Select —</option>
+                {% for d in departments %}
+                <option value="{{ d['name'] }}">{{ d['name'] }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Username
+            <input type="text" name="lec_username" autocomplete="username" required />
+        </label>
+        <label>Password
+            <input type="password" name="lec_password" autocomplete="new-password" required />
+        </label>
+        <div class="submit-row">
+            <button type="submit">Register as lecturer</button>
+        </div>
+    </form>
+</section>
+<p class="hint small-print" style="text-align:center;">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const dept = document.getElementById('regDepartmentSelect');
+  const branch = document.getElementById('regBranchSelect');
+  const section = document.getElementById('regSectionSelect');
+  if (!dept) return;
+
+  async function loadBranches() {
+    branch.innerHTML = '<option value="">Loading…</option>';
+    branch.disabled = true;
+    section.innerHTML = '<option value="">— Select program first —</option>';
+    section.disabled = true;
+    const id = dept.value;
+    if (!id) {
+      branch.innerHTML = '<option value="">— Select department first —</option>';
+      return;
+    }
+    const res = await fetch('{{ url_for("api_branches") }}?department_id=' + encodeURIComponent(id));
+    const data = await res.json();
+    branch.innerHTML = '<option value="">— Select —</option>';
+    data.forEach(function (b) {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.name;
+      branch.appendChild(opt);
+    });
+    branch.disabled = false;
+  }
+
+  async function loadSections() {
+    section.innerHTML = '<option value="">Loading…</option>';
+    section.disabled = true;
+    const id = branch.value;
+    if (!id) {
+      section.innerHTML = '<option value="">— Select program first —</option>';
+      return;
+    }
+    const res = await fetch('{{ url_for("api_sections") }}?branch_id=' + encodeURIComponent(id));
+    const data = await res.json();
+    section.innerHTML = '<option value="">— Select —</option>';
+    data.forEach(function (s) {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.name;
+      section.appendChild(opt);
+    });
+    section.disabled = false;
+  }
+
+  dept.addEventListener('change', loadBranches);
+  branch.addEventListener('change', loadSections);
+})();
+</script>
+{% endblock %}

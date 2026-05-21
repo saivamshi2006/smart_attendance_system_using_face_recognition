@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}College settings — {{ college_name }}{% endblock %}
+{% block heading %}College settings{% endblock %}
+
+{% block content %}
+<section class="page-section narrow-form">
+    <form method="post" enctype="multipart/form-data" class="form-grid">
+        <label>College name
+            <input type="text" name="college_name" value="{{ saved_college_name }}" required />
+        </label>
+        <label>College logo (image)
+            <input type="file" name="logo" accept="image/*" />
+        </label>
+        <div class="submit-row">
+            <button type="submit">Save</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

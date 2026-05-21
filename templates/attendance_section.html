@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Section attendance — {{ college_name }}{% endblock %}
+{% block heading %}Mark attendance{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <p class="muted">
+        <strong>{{ labels.department }}</strong> · {{ labels.branch }} · Section <strong>{{ labels.section }}</strong>
+        {% if current_period %}· <strong>Active period:</strong> {{ current_period }}{% endif %}
+    </p>
+
+    <h3>Roster</h3>
+    {% if students %}
+    <div class="table-wrap roster-table">
+        <table>
+            <thead>
+                <tr><th>Student ID</th><th>Name</th><th>Year</th><th>Manual (period {{ current_period or '—' }})</th></tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ s['student_id'] }}</td>
+                    <td>{{ s['name'] }}</td>
+                    <td>{{ s['year'] }}</td>
+                    <td>
+                        {% if current_period %}
+                        <form method="post" class="inline-form" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                            <input type="hidden" name="action" value="manual_toggle" />
+                            <input type="hidden" name="student_id" value="{{ s['student_id'] }}" />
+                            <input type="hidden" name="period" value="{{ current_period }}" />
+                            <button type="submit" name="status" value="Present" style="width:auto;">Present</button>
+                            <button type="submit" name="status" value="Absent" class="btn-danger" style="width:auto;">Absent</button>
+                        </form>
+                        {% else %}
+                        <span class="hint">Outside class hours</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="hint">No students in this section.</p>
+    {% endif %}
+
+    <h3>Iris capture</h3>
+    <form method="post" enctype="multipart/form-data" class="form-grid" id="mainForm">
+        <input type="hidden" name="captured_image" id="capturedImageInput" value="" />
+
+        <label>
+            Optional image upload (fallback)
+            <input type="file" name="image" id="optionalImageUpload" accept="image/*" />
+        </label>
+
+        <div class="camera-stage" style="margin-top:8px;">
+            <div id="cameraError" class="camera-error" hidden style="position:absolute;z-index:2;margin:12px;"></div>
+            <video id="video" autoplay muted playsinline></video>
+            <div class="face-overlay">
+                <div class="align-frame"></div>
+                <div class="face-oval"></div>
+                <div class="eye-guides"></div>
+            </div>
+        </div>
+        <canvas id="canvas" hidden></canvas>
+
+        <div class="submit-row">
+            <button type="submit">Mark attendance (iris)</button>
+            <a class="link-button" href="{{ url_for('lecturer_dashboard') }}">Change section</a>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/attendance_section.js') }}"></script>
+{% endblock %}

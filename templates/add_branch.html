@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Add Branch{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <h2>Add branch</h2>
+    <form method="post" class="form-grid narrow-form">
+        <label>
+            Department
+            <select name="department_id" required>
+                <option value="">— Select —</option>
+                {% for d in departments %}
+                <option value="{{ d['id'] }}">{{ d['name'] }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            Branch name
+            <input type="text" name="name" placeholder="e.g. Computer Science" required />
+        </label>
+        <div class="submit-row">
+            <button type="submit">Save</button>
+            <a class="link-button" href="{{ url_for('admin_dashboard') }}">Back to admin</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

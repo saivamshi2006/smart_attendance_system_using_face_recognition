@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Student — {{ college_name }}{% endblock %}
+{% block heading %}Student dashboard{% endblock %}
+
+{% block content %}
+<div id="attendancePopupHost"></div>
+
+<section class="dash-grid">
+    <div class="dash-card">
+        <h3>Profile</h3>
+        <p><strong>Name:</strong> {{ profile['name'] }}</p>
+        <p><strong>Roll number:</strong> {{ profile['student_id'] }}</p>
+        <p><strong>Department:</strong> {{ profile['dept_name'] }}</p>
+        <p><strong>Program:</strong> {{ profile['branch_name'] }}</p>
+        <p><strong>Year:</strong> {{ profile['year'] }}</p>
+        <p><strong>Section:</strong> {{ profile['section_name'] }}</p>
+    </div>
+    <div class="dash-card">
+        <h3>Attendance today</h3>
+        {% if day_stats.get('holiday') %}
+        <p class="muted">Public holiday — no classes.</p>
+        {% else %}
+        <p><strong>Present slots:</strong> {{ day_stats['present'] }}</p>
+        <p><strong>Absent slots:</strong> {{ day_stats['absent'] }}</p>
+        {% if day_stats['half_day'] %}
+        <span class="tag-half">Half day</span>
+        {% endif %}
+        {% endif %}
+    </div>
+    <div class="dash-card">
+        <h3>Overall (recorded)</h3>
+        {% if overall_pct is not none %}
+        <p class="stat-value" style="font-size:2rem;">{{ overall_pct }}%</p>
+        <p class="muted">Across all saved period rows</p>
+        {% else %}
+        <p class="muted">No attendance history yet.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="page-section" style="margin-top:20px;">
+    <h2>Today’s timetable ({{ today }})</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th>Time</th>
+                    <th>Subject</th>
+                    <th>Faculty</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in schedule_display %}
+                <tr>
+                    <td>{{ row.period }}</td>
+                    <td>{{ row.time }}</td>
+                    <td>{{ row.subject }}</td>
+                    <td>{{ row.faculty }}</td>
+                    <td>{{ row.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="submit-row spaced" style="margin-top:16px;">
+        <a class="link-button" href="{{ url_for('student_attendance_page') }}">Open camera attendance</a>
+        <a class="link-button" href="{{ url_for('student_calendar') }}">Monthly calendar</a>
+    </p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/student_dashboard.js') }}"></script>
+{% endblock %}

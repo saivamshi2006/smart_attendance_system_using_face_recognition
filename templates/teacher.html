@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Teacher — College Attendance{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <h2>Mark attendance by section</h2>
+    <p class="muted">Choose department, branch, and section. Attendance is recorded only for students in that section.</p>
+
+    <form method="post" action="{{ url_for('teacher_select_section') }}" class="form-grid" id="sectionPickForm">
+        <label>
+            Department
+            <select id="departmentSelect" required>
+                <option value="">— Select —</option>
+                {% for d in departments %}
+                <option value="{{ d['id'] }}">{{ d['name'] }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            Branch
+            <select id="branchSelect" disabled>
+                <option value="">— Select department first —</option>
+            </select>
+        </label>
+        <label>
+            Section
+            <select name="section_id" id="sectionSelect" disabled>
+                <option value="">— Select branch first —</option>
+            </select>
+        </label>
+        <div class="submit-row">
+            <button type="submit">Continue to attendance</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const dept = document.getElementById('departmentSelect');
+  const branch = document.getElementById('branchSelect');
+  const section = document.getElementById('sectionSelect');
+
+  async function loadBranches() {
+    branch.innerHTML = '<option value="">Loading…</option>';
+    branch.disabled = true;
+    section.innerHTML = '<option value="">— Select branch first —</option>';
+    section.disabled = true;
+    const id = dept.value;
+    if (!id) {
+      branch.innerHTML = '<option value="">— Select department first —</option>';
+      return;
+    }
+    const res = await fetch('{{ url_for("api_branches") }}?department_id=' + encodeURIComponent(id));
+    const data = await res.json();
+    branch.innerHTML = '<option value="">— Select —</option>';
+    data.forEach(function (b) {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.name;
+      branch.appendChild(opt);
+    });
+    branch.disabled = false;
+  }
+
+  async function loadSections() {
+    section.innerHTML = '<option value="">Loading…</option>';
+    section.disabled = true;
+    const id = branch.value;
+    if (!id) {
+      section.innerHTML = '<option value="">— Select branch first —</option>';
+      return;
+    }
+    const res = await fetch('{{ url_for("api_sections") }}?branch_id=' + encodeURIComponent(id));
+    const data = await res.json();
+    section.innerHTML = '<option value="">— Select —</option>';
+    data.forEach(function (s) {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.name;
+      section.appendChild(opt);
+    });
+    section.disabled = false;
+  }
+
+  dept.addEventListener('change', loadBranches);
+  branch.addEventListener('change', loadSections);
+})();
+</script>
+{% endblock %}

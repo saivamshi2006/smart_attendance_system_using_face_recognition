@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Add iris samples{% endblock %}
+{% block heading %}Add iris encodings{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <p class="muted">Student ID: <strong>{{ student_id }}</strong> — append new iris templates for attendance matching.</p>
+    <form method="post" enctype="multipart/form-data" class="form-grid" id="mainForm">
+        <input type="hidden" name="captured_image" id="capturedImageInput" value="" />
+        <label>Optional uploads
+            <input type="file" name="images" id="optionalImageUpload" accept="image/*" multiple />
+        </label>
+        <div class="camera-block">
+            <div id="cameraError" class="camera-error" hidden></div>
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="canvas" hidden></canvas>
+        </div>
+        <div class="submit-row">
+            <button type="submit">Save encodings</button>
+            <a class="link-button" href="{{ url_for('view_students') }}">Back</a>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/webcam_form_capture.js') }}"></script>
+{% endblock %}

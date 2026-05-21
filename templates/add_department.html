@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Add Department{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <h2>Add department</h2>
+    <form method="post" class="form-grid narrow-form">
+        <label>
+            Department name
+            <input type="text" name="name" placeholder="e.g. Engineering" required />
+        </label>
+        <div class="submit-row">
+            <button type="submit">Save</button>
+            <a class="link-button" href="{{ url_for('admin_dashboard') }}">Back to admin</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

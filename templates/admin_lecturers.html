@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Lecturers — {{ college_name }}{% endblock %}
+{% block heading %}Lecturer accounts{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <p class="muted">Lecturers self-register from the public registration page, or you can manage linked accounts here.</p>
+    {% if lecturers %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Username</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lec in lecturers %}
+                <tr>
+                    <td>{{ lec['lecturer_id'] }}</td>
+                    <td>{{ lec['name'] }}</td>
+                    <td>{{ lec['department'] }}</td>
+                    <td>{{ lec['username'] }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('delete_lecturer', lecturer_id=lec['lecturer_id']) }}" class="inline-form" onsubmit="return confirm('Delete lecturer and login?');">
+                            <button type="submit" class="btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="muted">No lecturer profiles stored yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

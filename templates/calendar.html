@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Calendar — {{ college_name }}{% endblock %}
+{% block heading %}Attendance calendar{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <p class="muted">{{ profile['name'] }} · {{ profile['branch_name'] }} · Year {{ profile['year'] }} · Section {{ profile['section_name'] }}</p>
+    <form method="get" class="filter-bar">
+        <label>Year
+            <input type="number" name="year" value="{{ year }}" min="2020" max="2035" />
+        </label>
+        <label>Month
+            <input type="number" name="month" value="{{ month }}" min="1" max="12" />
+        </label>
+        <button type="submit" style="width:auto;">View</button>
+    </form>
+    <p class="hint">Legend: green = full present day, red = all absent, yellow = mixed, grey = holiday, white = no data.</p>
+    <div class="cal-grid" style="margin-top:12px;">
+        {% for c in cells %}
+        <div class="cal-cell {{ c.flag }}" title="{{ c.iso }}">{{ c.day }}</div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

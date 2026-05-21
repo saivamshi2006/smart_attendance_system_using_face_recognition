@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}Add Student{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <h2>Enroll student</h2>
+    <p class="muted">Provide iris samples via live camera (on submit) or optional file upload. Encodings are stored against <strong>student ID</strong>.</p>
+
+    <form method="post" enctype="multipart/form-data" class="form-grid" id="mainForm">
+        <input type="hidden" name="captured_image" id="capturedImageInput" value="" />
+        <label>
+            Student ID
+            <input type="text" name="student_id" required placeholder="Roll number or ID" />
+        </label>
+        <label>
+            Full name
+            <input type="text" name="name" required />
+        </label>
+        <label>
+            Year
+            <select name="year" required>
+                <option value="1st">1st</option>
+                <option value="2nd">2nd</option>
+                <option value="3rd">3rd</option>
+                <option value="4th">4th</option>
+            </select>
+        </label>
+        <label>
+            Department
+            <select name="department_id" id="departmentSelect" required>
+                <option value="">— Select —</option>
+                {% for d in departments %}
+                <option value="{{ d['id'] }}">{{ d['name'] }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            Branch
+            <select name="branch_id" id="branchSelect" disabled>
+                <option value="">— Select department first —</option>
+            </select>
+        </label>
+        <label>
+            Section
+            <select name="section_id" id="sectionSelect" disabled>
+                <option value="">— Select branch first —</option>
+            </select>
+        </label>
+
+        <label>
+            Optional iris images (upload)
+            <input type="file" name="images" id="optionalImageUpload" accept="image/*" multiple />
+        </label>
+
+        <div class="camera-block">
+            <p>Webcam starts automatically. Click <strong>Save student</strong> to capture the current frame (unless you use uploads only).</p>
+            <div id="cameraError" class="camera-error" hidden></div>
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="canvas" hidden></canvas>
+        </div>
+
+        <div class="submit-row">
+            <button type="submit">Save student</button>
+            <a class="link-button" href="{{ url_for('view_students') }}">View students</a>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const dept = document.getElementById('departmentSelect');
+  const branch = document.getElementById('branchSelect');
+  const section = document.getElementById('sectionSelect');
+
+  async function loadBranches() {
+    branch.innerHTML = '<option value="">Loading…</option>';
+    branch.disabled = true;
+    section.innerHTML = '<option value="">— Select branch first —</option>';
+    section.disabled = true;
+    const id = dept.value;
+    if (!id) {
+      branch.innerHTML = '<option value="">— Select department first —</option>';
+      return;
+    }
+    const res = await fetch('{{ url_for("api_branches") }}?department_id=' + encodeURIComponent(id));
+    const data = await res.json();
+    branch.innerHTML = '<option value="">— Select —</option>';
+    data.forEach(function (b) {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.name;
+      branch.appendChild(opt);
+    });
+    branch.disabled = false;
+  }
+
+  async function loadSections() {
+    section.innerHTML = '<option value="">Loading…</option>';
+    section.disabled = true;
+    const id = branch.value;
+    if (!id) {
+      section.innerHTML = '<option value="">— Select branch first —</option>';
+      return;
+    }
+    const res = await fetch('{{ url_for("api_sections") }}?branch_id=' + encodeURIComponent(id));
+    const data = await res.json();
+    section.innerHTML = '<option value="">— Select —</option>';
+    data.forEach(function (s) {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.name;
+      section.appendChild(opt);
+    });
+    section.disabled = false;
+  }
+
+  dept.addEventListener('change', loadBranches);
+  branch.addEventListener('change', loadSections);
+})();
+</script>
+<script src="{{ url_for('static', filename='js/webcam_form_capture.js') }}"></script>
+{% endblock %}

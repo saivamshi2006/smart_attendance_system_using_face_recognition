@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Students — {{ college_name }}{% endblock %}
+{% block heading %}All students{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <p class="muted">Delete removes login (if linked), iris encodings, and enrollment.</p>
+
+    <form method="get" class="filter-bar">
+        <label>Search
+            <input type="search" name="q" value="{{ query or '' }}" placeholder="Name or roll number" />
+        </label>
+        <button type="submit" style="width:auto;">Search</button>
+    </form>
+
+    {% if students %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Year</th>
+                    <th>Department</th>
+                    <th>Program</th>
+                    <th>Section</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ s['student_id'] }}</td>
+                    <td>{{ s['name'] }}</td>
+                    <td>{{ s['year'] }}</td>
+                    <td>{{ s['department'] }}</td>
+                    <td>{{ s['branch'] }}</td>
+                    <td>{{ s['section'] }}</td>
+                    <td style="white-space:nowrap;">
+                        <a class="link-button" href="{{ url_for('add_student_encodings', student_id=s['student_id']) }}" style="padding:8px 10px;font-size:0.9rem;">Iris</a>
+                        <form method="post" action="{{ url_for('delete_student', student_id=s['student_id']) }}" class="inline-form" onsubmit="return confirm('Delete this student?');" style="display:inline;">
+                            <button type="submit" class="btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No students match.</p>
+    {% endif %}
+
+    <p class="submit-row spaced">
+        <a class="link-button" href="{{ url_for('add_student') }}">Add student</a>
+        <a class="link-button" href="{{ url_for('admin_dashboard') }}">Admin home</a>
+    </p>
+</section>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Login — {{ college_name }}{% endblock %}
+{% block heading %}Sign in{% endblock %}
+
+{% block content %}
+<section class="page-section login-card">
+    <p class="muted">Admin, lecturer, and student accounts.</p>
+    <form method="post" action="{{ url_for('login') }}" class="form-grid">
+        {% if request.args.get('next') %}
+        <input type="hidden" name="next" value="{{ request.args.get('next') }}" />
+        {% endif %}
+        <label>
+            Username
+            <input type="text" name="username" autocomplete="username" required />
+        </label>
+        <label>
+            Password
+            <input type="password" name="password" autocomplete="current-password" required />
+        </label>
+        <div class="submit-row">
+            <button type="submit">Log in</button>
+        </div>
+    </form>
+    <p class="hint small-print">Default dev accounts: <code>admin</code> / <code>admin123</code>, <code>lecturer</code> / <code>lecturer123</code> (change in production). Students and lecturers can <a href="{{ url_for('register') }}">register</a>.</p>
+</section>
+{% endblock %}
